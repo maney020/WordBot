@@ -1,15 +1,21 @@
 from flask import Flask, request, jsonify
 import json
+import unirest
+
 
 app = Flask(__name__)
-port = 5000
+port = '5000'
 
 @app.route('/', methods=['POST'])
 def index():
-  capture =json.loads(request.get_data())
-  print json.dumps(capture, indent=4, sort_keys=True)
-  value = capture['conversation']['memory']['SearchWord']['raw']
-  print value
+  print(json.loads(request.get_data()))
+  response = unirest.get("https://wordsapiv1.p.mashape.com/words/modern/examples",
+  headers={
+    "X-Mashape-Key": "7pBaJUdsYLmshtq9gKZgC2S1WLVmp1XVyhGjsnK8AX0kZGT6mg",
+    "X-Mashape-Host": "wordsapiv1.p.mashape.com"
+    }
+  )
+  
   return jsonify(
     status=200,
     replies=[{
