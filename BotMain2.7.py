@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify
 import json
 import unirest
@@ -14,7 +15,7 @@ def resultword(query):
     text = query.lower()
     text = (text.encode('ascii','ignore')).decode('utf-8')
 
-    text = re.sub(r"[-()\"#/@\\;.\[:\]<>{}`^&*_\`?!+=~|,]", " ", text)
+    text = re.sub(r"[-()\"#/@\\;.\[:\]<>{}`^&*_\`?!'+=~|,]", " ", text)
 
 
     stopwords = ['of','with','word','find','me','is','know','mean','by','give','']
@@ -26,25 +27,32 @@ def resultword(query):
 
     return resultword
 
-### it will retrieve one example of the word from wordApi
+### it will retrieve one random example of the word from wordApi
 def meaning(text):
 
     try:
         import unirest
+        import random
 
         print text
-        response = unirest.get("https://wordsapiv1.p.mashape.com/words/{}/examples".format(text),
+        response = unirest.get("https://wordsapiv1.p.mashape.com/words/{}/definitions".format(text),
         headers={
         "X-Mashape-Key": "7pBaJUdsYLmshtq9gKZgC2S1WLVmp1XVyhGjsnK8AX0kZGT6mg",
         "X-Mashape-Host": "wordsapiv1.p.mashape.com"
         }
         )
         result = response.body
-        var = result['examples']
-        print var[0]
-        return var[0]
+        definitionsArray = result['definitions']
+        resultLength = len(definitionsArray)-1
+        randnum = random.randint(0,resultLength)
+        print randnum
+        meaningWord = definitionsArray[randnum]['definition']
+        print meaningWord
+        
+        return meaningWord
     except:
         return "I am unable to find the meaning of the word."
+
 
 
 
@@ -56,7 +64,7 @@ def index():
   capture =json.loads(request.get_data())
   
   #to print the output in JSON format for testing purpose
-  #print json.dumps(capture, indent=4, sort_keys=True)
+  print json.dumps(capture, indent=4, sort_keys=True)
   text = capture['conversation']['memory']['SearchWord']['raw']
   print text
 
@@ -85,4 +93,5 @@ def errors():
   print(json.loads(request.get_data()))
   return jsonify(status=200)
 
-app.run(port=port)
+if __name__ == '__main__':
+    app.run(debug=False)
